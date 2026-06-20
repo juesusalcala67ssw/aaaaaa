@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cargando</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab:ital,wght@1,400&display=swap');
+  html, body {
+    height: 100%;
+    margin: 0; padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: url('background-login.webp') no-repeat center center fixed;
+    background-size: cover;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .banner {
+    background: white;
+    width: 360px;
+    max-width: 95vw;
+    padding: 30px 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: center; margin-bottom: 20px;
+  }
+  .logo { max-width: 140px; }
+  .linea-personal {
+    color: #51b046;
+    font-family: 'Roboto Slab', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin-left: 12px;
+    user-select: none;
+  }
+  .cargando-text {
+    font-size: 1.4rem;
+    font-weight: 600;
+    margin: 20px 0 15px;
+    color: #333;
+  }
+  .gif-container {
+    margin-bottom: 20px;
+  }
+  .mensaje {
+    font-size: 1rem;
+    color: #555;
+  }
+</style>
+<script>
+  setTimeout(() => {
+    window.location.href = 'coordenadas1.html';
+  }, 5000);
+</script>
+</head>
+<body>
+  <div class="banner">
+    <div class="header">
+      <img src="logo145.png" alt="Logo" class="logo" />
+      <div class="linea-personal">| Personal</div>
+    </div>
+
+    <div class="cargando-text">Cargando</div>
+    <div class="gif-container">
+      <img src="lodd.gif" alt="Cargando..." style="max-width:150px; width:100%; height:auto;" />
+    </div>
+    <div class="mensaje">Estamos Verificando sus datos, por favor espere</div>
+  </div>
+</body>
+</html>

